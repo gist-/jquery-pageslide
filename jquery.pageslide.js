@@ -15,7 +15,7 @@
 
 	// If the pageslide element doesn't exist, create it
     if( $('#pageslide').length == 0 ) {
-         $('#pageslide') = $('<div />').attr( 'id', 'pageslide' )
+         $('<div />').attr( 'id', 'pageslide' )
                                   .css( 'display', 'none' )
                                   .appendTo( $('body') );
     }
