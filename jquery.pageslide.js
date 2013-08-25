@@ -148,8 +148,7 @@
 
 	// Close the pageslide
 	$.pageslide.close = function( callback ) {
-        var $('#pageslide') = $('#pageslide'),
-            slideWidth = $('#pageslide').outerWidth( true ),
+        var slideWidth = $('#pageslide').outerWidth( true ),
             speed = $('#pageslide').data( 'speed' ),
             bodyAnimateIn = {},
             slideAnimateIn = {}
