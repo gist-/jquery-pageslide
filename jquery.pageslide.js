@@ -10,28 +10,24 @@
 */
 
 ;(function($){
-    // Convenience vars for accessing elements
-    var $body = $('body'),
-        $pageslide = $('#pageslide');
-    
     var _sliding = false,   // Mutex to assist closing only once
         _lastCaller;        // Used to keep track of last element to trigger pageslide
-    
+
 	// If the pageslide element doesn't exist, create it
-    if( $pageslide.length == 0 ) {
-         $pageslide = $('<div />').attr( 'id', 'pageslide' )
+    if( $('#pageslide').length == 0 ) {
+         $('#pageslide') = $('<div />').attr( 'id', 'pageslide' )
                                   .css( 'display', 'none' )
                                   .appendTo( $('body') );
     }
-    
+
     /*
-     * Private methods 
+     * Private methods
      */
     function _load( url, useIframe ) {
         // Are we loading an element from the page or a URL?
-        if ( url.indexOf("#") === 0 ) {                
-            // Load a page element                
-            $(url).clone(true).appendTo( $pageslide.empty() ).show();
+        if ( url.indexOf("#") === 0 ) {
+            // Load a page element
+            $(url).clone(true).appendTo( $('#pageslide').empty() ).show();
         } else {
             // Load a URL. Into an iframe?
             if( useIframe ) {
@@ -44,78 +40,78 @@
                                                 width: "100%",
                                                 height: "100%"
                                             });
-                
-                $pageslide.html( iframe );
+
+                $('#pageslide').html( iframe );
             } else {
-                $pageslide.load( url );
+                $('#pageslide').load( url );
             }
-            
-            $pageslide.data( 'localEl', false );
-            
+
+            $('#pageslide').data( 'localEl', false );
+
         }
     }
-    
+
     // Function that controls opening of the pageslide
     function _start( direction, speed ) {
-        var slideWidth = $pageslide.outerWidth( true ),
+        var slideWidth = $('#pageslide').outerWidth( true ),
             bodyAnimateIn = {},
             slideAnimateIn = {};
-        
+
         // If the slide is open or opening, just ignore the call
-        if( $pageslide.is(':visible') || _sliding ) return;	        
+        if( $('#pageslide').is(':visible') || _sliding ) return;
         _sliding = true;
-                                                                    
+
         switch( direction ) {
             case 'left':
-                $pageslide.css({ left: 'auto', right: '-' + slideWidth + 'px' });
+                $('#pageslide').css({ left: 'auto', right: '-' + slideWidth + 'px' });
                 bodyAnimateIn['margin-left'] = '-=' + slideWidth;
                 slideAnimateIn['right'] = '+=' + slideWidth;
                 break;
             default:
-                $pageslide.css({ left: '-' + slideWidth + 'px', right: 'auto' });
+                $('#pageslide').css({ left: '-' + slideWidth + 'px', right: 'auto' });
                 bodyAnimateIn['margin-left'] = '+=' + slideWidth;
                 slideAnimateIn['left'] = '+=' + slideWidth;
                 break;
         }
-                    
+
         // Animate the slide, and attach this slide's settings to the element
-        $body.animate(bodyAnimateIn, speed);
-        $pageslide.show()
+        $('body').animate(bodyAnimateIn, speed);
+        $('#pageslide').show()
                   .animate(slideAnimateIn, speed, function() {
                       _sliding = false;
                   });
     }
-      
+
     /*
-     * Declaration 
+     * Declaration
      */
     $.fn.pageslide = function(options) {
         var $elements = this;
-        
+
         // On click
         $elements.click( function(e) {
             var $self = $(this),
                 settings = $.extend({ href: $self.attr('href') }, options);
-            
+
             // Prevent the default behavior and stop propagation
             e.preventDefault();
             e.stopPropagation();
-            
-            if ( $pageslide.is(':visible') && $self[0] == _lastCaller ) {
+
+            if ( $('#pageslide').is(':visible') && $self[0] == _lastCaller ) {
                 // If we clicked the same element twice, toggle closed
                 $.pageslide.close();
-            } else {                 
+            } else {
                 // Open
                 $.pageslide( settings );
 
                 // Record the last element to trigger pageslide
                 _lastCaller = $self[0];
-            }       
-        });                   
+            }
+        });
 	};
-	
+
 	/*
-     * Default settings 
+     * Default settings
      */
     $.fn.pageslide.defaults = {
         speed:      200,        // Accepts standard jQuery effects speeds (i.e. fast, normal or milliseconds)
@@ -124,45 +120,45 @@
         iframe:     true,       // By default, linked pages are loaded into an iframe. Set this to false if you don't want an iframe.
         href:       null        // Override the source of the content. Optional in most cases, but required when opening pageslide programmatically.
     };
-	
+
 	/*
-     * Public methods 
+     * Public methods
      */
-	
+
 	// Open the pageslide
-	$.pageslide = function( options ) {	    
+	$.pageslide = function( options ) {
 	    // Extend the settings with those the user has provided
         var settings = $.extend({}, $.fn.pageslide.defaults, options);
-	    
+
 	    // Are we trying to open in different direction?
-        if( $pageslide.is(':visible') && $pageslide.data( 'direction' ) != settings.direction) {
+        if( $('#pageslide').is(':visible') && $('#pageslide').data( 'direction' ) != settings.direction) {
             $.pageslide.close(function(){
                 _load( settings.href, settings.iframe );
                 _start( settings.direction, settings.speed );
             });
-        } else {                
+        } else {
             _load( settings.href, settings.iframe );
-            if( $pageslide.is(':hidden') ) {
+            if( $('#pageslide').is(':hidden') ) {
                 _start( settings.direction, settings.speed );
             }
         }
-        
-        $pageslide.data( settings );
+
+        $('#pageslide').data( settings );
 	}
-	
+
 	// Close the pageslide
 	$.pageslide.close = function( callback ) {
-        var $pageslide = $('#pageslide'),
-            slideWidth = $pageslide.outerWidth( true ),
-            speed = $pageslide.data( 'speed' ),
+        var $('#pageslide') = $('#pageslide'),
+            slideWidth = $('#pageslide').outerWidth( true ),
+            speed = $('#pageslide').data( 'speed' ),
             bodyAnimateIn = {},
             slideAnimateIn = {}
-            	        
+
         // If the slide isn't open, just ignore the call
-        if( $pageslide.is(':hidden') || _sliding ) return;	        
+        if( $('#pageslide').is(':hidden') || _sliding ) return;
         _sliding = true;
-        
-        switch( $pageslide.data( 'direction' ) ) {
+
+        switch( $('#pageslide').data( 'direction' ) ) {
             case 'left':
                 bodyAnimateIn['margin-left'] = '+=' + slideWidth;
                 slideAnimateIn['right'] = '-=' + slideWidth;
@@ -172,19 +168,19 @@
                 slideAnimateIn['left'] = '-=' + slideWidth;
                 break;
         }
-        
-        $pageslide.animate(slideAnimateIn, speed);
-        $body.animate(bodyAnimateIn, speed, function() {
-            $pageslide.hide();
+
+        $('#pageslide').animate(slideAnimateIn, speed);
+        $('body').animate(bodyAnimateIn, speed, function() {
+            $('#pageslide').hide();
             _sliding = false;
             if( typeof callback != 'undefined' ) callback();
         });
     }
-	
+
 	/* Events */
-	
+
 	// Don't let clicks to the pageslide close the window
-    $pageslide.click(function(e) {
+    $('#pageslide').click(function(e) {
         e.stopPropagation();
     });
 
@@ -192,11 +188,11 @@
 	$(document).bind('click keyup', function(e) {
 	    // If this is a keyup event, let's see if it's an ESC key
         if( e.type == "keyup" && e.keyCode != 27) return;
-	    
-	    // Make sure it's visible, and we're not modal	    
-	    if( $pageslide.is( ':visible' ) && !$pageslide.data( 'modal' ) ) {	        
+
+	    // Make sure it's visible, and we're not modal
+	    if( $('#pageslide').is( ':visible' ) && !$('#pageslide').data( 'modal' ) ) {
 	        $.pageslide.close();
 	    }
 	});
-	
+
 })(jQuery);
